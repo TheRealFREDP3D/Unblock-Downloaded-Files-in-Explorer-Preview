@@ -2,6 +2,12 @@
 
 Windows marks files downloaded from the internet with a "blocked" flag (the NTFS `Zone.Identifier` alternate data stream), which prevents Explorer's preview pane from rendering them until you manually check "Unblock" in the file's Properties dialog. This guide sets up a background watcher that unblocks new files in `Downloads` automatically, the moment they finish downloading — no manual steps needed.
 
+**Background:** Starting with Windows security updates released on October 14, 2025 (KB5066835 for Windows 11, KB5066791 for Windows 10), File Explorer automatically disables preview for files marked with "Mark of the Web" to prevent NTLM hash theft attacks. When you try to preview such files, the pane displays:
+
+> "The file you are attempting to preview could harm your computer. If you trust the file and the source you received it from, open it to view its contents."
+
+This script automatically removes that block so previews work immediately.
+
 ## How it works
 
 A PowerShell script uses `FileSystemWatcher` to monitor your `Downloads` folder in the background. Whenever a file is created or renamed (covers browsers that download to a temp name like `.crdownload` and rename on completion), it runs `Unblock-File` on it automatically. A Windows Scheduled Task starts this watcher silently every time you log on, so it's always running without you thinking about it.
